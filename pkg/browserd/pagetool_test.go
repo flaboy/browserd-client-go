@@ -12,8 +12,8 @@ func TestSupportedPageToolMethodsAreBrowserNativeOnly(t *testing.T) {
 	if !IsSupportedPageToolMethod("mouse.wheel") {
 		t.Fatal("mouse.wheel must be supported")
 	}
-	if IsSupportedPageToolMethod("visual.getViewportContent") {
-		t.Fatal("visual methods must not be production-supported without a browserd visual provider")
+	if IsSupportedPageToolMethod("browser.unsupported") {
+		t.Fatal("unknown methods must not be production-supported")
 	}
 }
 
@@ -32,8 +32,8 @@ func TestBuildPageToolRuntimeScriptUsesConfiguredBridge(t *testing.T) {
 			t.Fatalf("runtime script missing %s:\n%s", want, script)
 		}
 	}
-	if strings.Contains(script, "visual.getViewportContent") {
-		t.Fatal("runtime script must not expose unsupported visual methods")
+	if strings.Contains(script, "browser.unsupported") {
+		t.Fatal("runtime script must not expose unsupported methods")
 	}
 }
 
@@ -41,8 +41,8 @@ func TestValidatePageToolInput(t *testing.T) {
 	if err := ValidatePageToolInput(PageToolInput{Method: "page.title"}); err != nil {
 		t.Fatalf("page.title should be valid: %v", err)
 	}
-	if err := ValidatePageToolInput(PageToolInput{Method: "visual.getViewportContent"}); err == nil {
-		t.Fatal("unsupported visual method should fail validation")
+	if err := ValidatePageToolInput(PageToolInput{Method: "browser.unsupported"}); err == nil {
+		t.Fatal("unsupported method should fail validation")
 	}
 	if err := ValidatePageToolInput(PageToolInput{Method: ""}); err == nil {
 		t.Fatal("empty method should fail validation")
