@@ -169,12 +169,26 @@ type UploadFilesResult struct {
 	FileNames []string `json:"fileNames"`
 }
 
+type PageToolInput struct {
+	Method    string         `json:"method"`
+	Payload   map[string]any `json:"payload,omitempty"`
+	TimeoutMs int            `json:"timeoutMs,omitempty"`
+}
+
+type PageToolResult map[string]any
+
+type PageToolBridgeConfig struct {
+	Enabled bool   `json:"enabled"`
+	Name    string `json:"name,omitempty"`
+}
+
 type EvaluateInput struct {
-	Script             string `json:"script"`
-	Args               []any  `json:"args,omitempty"`
-	TimeoutMs          int    `json:"timeoutMs,omitempty"`
-	World              string `json:"world,omitempty"`
-	AllowDuringHandoff bool   `json:"allowDuringHandoff,omitempty"`
+	Script             string                `json:"script"`
+	Args               []any                 `json:"args,omitempty"`
+	TimeoutMs          int                   `json:"timeoutMs,omitempty"`
+	World              string                `json:"world,omitempty"`
+	AllowDuringHandoff bool                  `json:"allowDuringHandoff,omitempty"`
+	PageToolBridge     *PageToolBridgeConfig `json:"pageToolBridge,omitempty"`
 }
 
 type EvaluateResult struct {

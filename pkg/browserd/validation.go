@@ -69,6 +69,20 @@ func ValidateScreenshotInput(input ScreenshotInput) error {
 	return nil
 }
 
+func ValidatePageToolInput(input PageToolInput) error {
+	method := strings.TrimSpace(input.Method)
+	if method == "" {
+		return Error{Code: "browserd_pagetool_method_required", Message: "pageTool method is required"}
+	}
+	if !IsSupportedPageToolMethod(method) {
+		return Error{Code: "browserd_pagetool_method_unsupported", Message: "pageTool method is not supported: " + method}
+	}
+	if input.TimeoutMs < 0 {
+		return Error{Code: "browserd_timeout_invalid", Message: "timeoutMs must be greater than or equal to 0"}
+	}
+	return nil
+}
+
 func isAllowedPressKey(key string) bool {
 	key = strings.TrimSpace(key)
 	if len([]rune(key)) == 1 && key != "" {

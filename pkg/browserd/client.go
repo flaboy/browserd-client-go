@@ -89,6 +89,15 @@ func (c *Client) WaitFor(ctx context.Context, runtimeSessionID string, input Wai
 	return out, err
 }
 
+func (c *Client) PageTool(ctx context.Context, runtimeSessionID string, input PageToolInput) (PageToolResult, error) {
+	if err := ValidatePageToolInput(input); err != nil {
+		return nil, err
+	}
+	var out PageToolResult
+	err := c.doJSON(ctx, http.MethodPost, sessionPath(runtimeSessionID, "pageTool"), input, &out)
+	return out, err
+}
+
 func (c *Client) Evaluate(ctx context.Context, runtimeSessionID string, input EvaluateInput) (EvaluateResult, error) {
 	var out EvaluateResult
 	err := c.doJSON(ctx, http.MethodPost, sessionPath(runtimeSessionID, "evaluate"), input, &out)

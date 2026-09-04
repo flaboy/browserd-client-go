@@ -27,6 +27,8 @@ func TestClientEndpointsCallCurrentBrowserdPaths(t *testing.T) {
 			writeJSON(t, w, map[string]any{"ok": true, "action": "click", "ref": "e1"})
 		case "/v1/sessions/rt_1/wait-for":
 			writeJSON(t, w, map[string]any{"ok": true, "conditionType": "ref_actionable", "ref": "e1"})
+		case "/v1/sessions/rt_1/pageTool":
+			writeJSON(t, w, map[string]any{"value": "Example"})
 		case "/v1/sessions/rt_1/evaluate":
 			writeJSON(t, w, map[string]any{"result": map[string]any{"ok": true}, "url": "https://example.com", "title": "Example"})
 		case "/v1/sessions/rt_1/screenshot":
@@ -69,6 +71,9 @@ func TestClientEndpointsCallCurrentBrowserdPaths(t *testing.T) {
 	if _, err := client.WaitFor(ctx, "rt_1", WaitForInput{Condition: WaitForCondition{Type: "ref_actionable", Ref: "e1"}}); err != nil {
 		t.Fatal(err)
 	}
+	if _, err := client.PageTool(ctx, "rt_1", PageToolInput{Method: "page.title"}); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := client.Evaluate(ctx, "rt_1", EvaluateInput{Script: "return true"}); err != nil {
 		t.Fatal(err)
 	}
@@ -100,6 +105,7 @@ func TestClientEndpointsCallCurrentBrowserdPaths(t *testing.T) {
 		"GET /v1/sessions/rt_1/snapshot?mode=refs",
 		"POST /v1/sessions/rt_1/act",
 		"POST /v1/sessions/rt_1/wait-for",
+		"POST /v1/sessions/rt_1/pageTool",
 		"POST /v1/sessions/rt_1/evaluate",
 		"POST /v1/sessions/rt_1/screenshot",
 		"POST /v1/sessions/rt_1/upload-files",
