@@ -153,13 +153,13 @@ func (c *Client) doJSON(ctx context.Context, method string, path string, input a
 	if input != nil {
 		raw, err := json.Marshal(input)
 		if err != nil {
-			return Error{Code: "browserd_request_invalid", Message: err.Error(), Operation: method, Path: path}
+			return Error{Code: "browserd_request_invalid", Message: err.Error(), Operation: method, Path: path, Cause: err}
 		}
 		body = bytes.NewReader(raw)
 	}
 	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)
 	if err != nil {
-		return Error{Code: "browserd_request_invalid", Message: err.Error(), Operation: method, Path: path}
+		return Error{Code: "browserd_request_invalid", Message: err.Error(), Operation: method, Path: path, Cause: err}
 	}
 	if input != nil {
 		req.Header.Set("Content-Type", "application/json")
@@ -169,16 +169,16 @@ func (c *Client) doJSON(ctx context.Context, method string, path string, input a
 	}
 	res, err := c.httpClient.Do(req)
 	if err != nil {
-		return Error{Code: "browserd_unavailable", Message: err.Error(), Operation: method, Path: path}
+		return Error{Code: "browserd_unavailable", Message: err.Error(), Operation: method, Path: path, Cause: err}
 	}
 	defer func() { _ = res.Body.Close() }()
 	raw, err := io.ReadAll(res.Body)
 	if err != nil {
-		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path}
+		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path, Cause: err}
 	}
 	var envelope responseEnvelope[json.RawMessage]
 	if err := json.Unmarshal(raw, &envelope); err != nil {
-		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path}
+		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path, Cause: err}
 	}
 	if envelope.Error != nil {
 		return Error{Code: envelope.Error.Code, Message: envelope.Error.Message, StatusCode: res.StatusCode, Operation: method, Path: path}
@@ -193,7 +193,7 @@ func (c *Client) doJSON(ctx context.Context, method string, path string, input a
 		return nil
 	}
 	if err := json.Unmarshal(*envelope.Data, output); err != nil {
-		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path}
+		return Error{Code: "browserd_response_invalid", Message: err.Error(), StatusCode: res.StatusCode, Operation: method, Path: path, Cause: err}
 	}
 	return nil
 }

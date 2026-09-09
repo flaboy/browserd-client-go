@@ -12,7 +12,10 @@ type Error struct {
 	StatusCode int
 	Operation  string
 	Path       string
+	Cause      error
 }
+
+func (e Error) Unwrap() error { return e.Cause }
 
 func (e Error) Error() string {
 	code := strings.TrimSpace(e.Code)
