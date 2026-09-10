@@ -61,7 +61,19 @@ func (c *Client) CreateSession(ctx context.Context, input CreateSessionInput) (S
 func (c *Client) Navigate(ctx context.Context, runtimeSessionID string, input NavigateInput) (NavigateResult, error) {
 	var out NavigateResult
 	err := c.doJSON(ctx, http.MethodPost, sessionPath(runtimeSessionID, "navigate"), input, &out)
-	return out, err
+	if err != nil {
+		return out, err
+	}
+	if input.IncludeSnapshot {
+		err = ValidateSnapshotResult(out.Snapshot)
+		if err == nil && out.URL != out.Snapshot.Page["url"] {
+			err = fmt.Errorf("navigation URL does not match snapshot URL")
+		}
+		if err != nil {
+			return NavigateResult{}, Error{Code: "BROWSERD_SNAPSHOT_REQUIRED", Message: "navigation did not return the requested valid snapshot", Operation: http.MethodPost, Path: sessionPath(runtimeSessionID, "navigate"), Cause: err}
+		}
+	}
+	return out, nil
 }
 
 func (c *Client) Snapshot(ctx context.Context, runtimeSessionID string, input SnapshotInput) (SnapshotResult, error) {

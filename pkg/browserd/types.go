@@ -48,6 +48,7 @@ type CommitResult struct {
 }
 
 type NavigateInput struct {
+	IncludeSnapshot           bool   `json:"includeSnapshot,omitempty"`
 	URL                       string `json:"url"`
 	WaitUntil                 string `json:"waitUntil,omitempty"`
 	TimeoutMs                 int    `json:"timeoutMs,omitempty"`
@@ -55,9 +56,10 @@ type NavigateInput struct {
 }
 
 type NavigateResult struct {
-	URL             string `json:"url"`
-	Title           string `json:"title,omitempty"`
-	SnapshotCleared bool   `json:"snapshotCleared"`
+	Snapshot        *SnapshotResult `json:"snapshot,omitempty"`
+	URL             string          `json:"url"`
+	Title           string          `json:"title,omitempty"`
+	SnapshotCleared bool            `json:"snapshotCleared"`
 }
 
 type SnapshotInput struct {
