@@ -71,6 +71,8 @@ type PageTable struct {
 	Rows    [][]any  `json:"rows"`
 }
 
+// PageSnapshot preserves the server's column-based tables verbatim, including
+// links.image_url and image-only links. Image requirements belong to consumers.
 type PageSnapshot map[string]any
 
 type SnapshotResult struct {
