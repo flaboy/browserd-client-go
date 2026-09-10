@@ -15,6 +15,8 @@ func TestNavigateIncludeSnapshot(t *testing.T) {
 	}{
 		{"valid", `{"url":"https://example.com/final","snapshot":{"snapshotId":"snap_1","page":{"url":"https://example.com/final","groups":{}}}}`, true, false},
 		{"legacy opt out", `{"url":"https://example.com/","snapshotCleared":true}`, false, false},
+		{"malformed snapshot", `{"url":"https://example.com/","snapshot":[]}`, true, true},
+		{"numeric id", `{"url":"https://example.com/","snapshot":{"snapshotId":7,"page":{"url":"https://example.com/","groups":{}}}}`, true, true},
 		{"missing", `{"url":"https://example.com/","snapshotCleared":true}`, true, true},
 		{"null", `{"url":"https://example.com/","snapshot":null}`, true, true},
 		{"empty id", `{"url":"https://example.com/","snapshot":{"page":{"url":"https://example.com/","groups":{}}}}`, true, true},
@@ -51,6 +53,9 @@ func TestNavigateIncludeSnapshot(t *testing.T) {
 			}
 			result, err := c.Navigate(context.Background(), "rt_1", NavigateInput{URL: "https://example.com/", IncludeSnapshot: tc.include})
 			if tc.wantError {
+				if result.Snapshot != nil || result.URL != "" {
+					t.Errorf("failed navigation exposed partial result: %+v", result)
+				}
 				var e Error
 				if !AsError(err, &e) || e.Code != "BROWSERD_SNAPSHOT_REQUIRED" {
 					t.Fatalf("expected protocol error, got %v", err)

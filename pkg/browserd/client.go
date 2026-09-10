@@ -62,7 +62,11 @@ func (c *Client) Navigate(ctx context.Context, runtimeSessionID string, input Na
 	var out NavigateResult
 	err := c.doJSON(ctx, http.MethodPost, sessionPath(runtimeSessionID, "navigate"), input, &out)
 	if err != nil {
-		return out, err
+		var response Error
+		if input.IncludeSnapshot && AsError(err, &response) && response.Code == "browserd_response_invalid" && response.StatusCode >= 200 && response.StatusCode < 300 {
+			return NavigateResult{}, Error{Code: "BROWSERD_SNAPSHOT_REQUIRED", Message: "navigation did not return the requested valid snapshot", Operation: http.MethodPost, Path: sessionPath(runtimeSessionID, "navigate"), StatusCode: response.StatusCode, Cause: err}
+		}
+		return NavigateResult{}, err
 	}
 	if input.IncludeSnapshot {
 		err = ValidateSnapshotResult(out.Snapshot)
