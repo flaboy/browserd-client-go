@@ -19,8 +19,6 @@ func ValidateSnapshotResult(snapshot *SnapshotResult) error {
 	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "" {
 		return fmt.Errorf("snapshot page URL must be HTTP(S)")
 	}
-	if groups, ok := snapshot.Page["groups"].(map[string]any); !ok || groups == nil {
-		return fmt.Errorf("snapshot page groups must be an object")
-	}
-	return nil
+	_, err = DecodeSnapshotPage(snapshot.Page)
+	return err
 }
